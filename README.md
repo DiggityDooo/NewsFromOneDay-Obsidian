@@ -57,6 +57,7 @@ python3 runner.py
 This will activate the 30-minute scraping cycle and the 5-minute cleanup logic.
 
 ---
+<img width="924" height="1397" alt="image" src="https://github.com/user-attachments/assets/047e4307-624e-4132-8546-909b276d730e" />
 
 ## 🔍 Code Review Findings
 
