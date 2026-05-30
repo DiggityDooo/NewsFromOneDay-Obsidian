@@ -1,6 +1,6 @@
 # DeVault Intelligence Hub
 
-DeVault is an automated news scraping and AI-driven intelligence analysis pipeline. It is designed to collect headlines from various sources, extract deep context from key articles, and generate structured intelligence reports for use in Obsidian or other markdown-based knowledge management systems. All of this is done for absoulety free, using local compute power.
+DeVault is an automated news scraping and AI-driven intelligence analysis pipeline. It is designed to collect headlines from various sources, extract deep context from key articles, and generate structured intelligence reports.
 
 ## 🚀 Features
 
@@ -16,6 +16,7 @@ DeVault is an automated news scraping and AI-driven intelligence analysis pipeli
 End-to-end flow from orchestration through scraping, AI analysis, vault storage, and external publishing.
 
 ```mermaid
+%%{init: {'theme': 'dark', 'themeVariables': { 'primaryColor':'#0d1117', 'primaryTextColor':'#c9d1d9', 'primaryBorderColor':'#30363d', 'lineColor':'#58a6ff', 'secondBkgColor':'#161b22', 'tertiaryColor':'#21262d', 'tertiaryTextColor':'#c9d1d9', 'tertiaryBorderColor':'#30363d'}}}%%
 flowchart TB
     %% --- RUNNER (24H ORCHESTRATOR) ---
     subgraph Runner["runner.py — 24h orchestrator"]
@@ -91,26 +92,27 @@ flowchart TB
     SUM --> OBS
     ORG --> ARCH
 
-    %% --- CLASS STYLING (FALLBACK SAFE) ---
-    classDef default fill:#1f242c,stroke:#30363d,stroke-width:1px,color:#c9d1d9;
-    classDef source fill:#161b22,stroke:#58a6ff,stroke-width:1px,color:#c9d1d9;
-    classDef loop fill:#21262d,stroke:#f0883e,stroke-width:1px,color:#c9d1d9;
-    classDef terminal fill:#0d1117,stroke:#da3633,stroke-width:1px,color:#f85149;
-    classDef vault fill:#1f242c,stroke:#8b949e,stroke-dasharray: 5 5,color:#c9d1d9;
+    %% --- CLASS STYLING ---
+    classDef default fill:#0d1117,stroke:#58a6ff,stroke-width:2px,color:#c9d1d9,font-weight:bold;
+    classDef source fill:#161b22,stroke:#3fb950,stroke-width:2px,color:#c9d1d9;
+    classDef loop fill:#21262d,stroke:#f0883e,stroke-width:2px,color:#c9d1d9,font-weight:bold;
+    classDef terminal fill:#0d1117,stroke:#da3633,stroke-width:2px,color:#f85149,font-weight:bold;
+    classDef vault fill:#161b22,stroke:#8b949e,stroke-width:2px,stroke-dasharray: 5 5,color:#c9d1d9;
+    classDef process fill:#0d1117,stroke:#58a6ff,stroke-width:2px,color:#c9d1d9;
 
     class S1,S2,S3,S4,S5,S6 source;
     class WAIT,CLEANUP loop;
     class START,STOP terminal;
     class HEAD,SUM,ARCH,OBS vault;
+    class P1,P2,P3,P4,SAVE_H,PREV,PROMPT,PUSH,MOVE,ORG,RUN_SCRAPER process;
 
-
-    %% Direct background styling for the containers to kill the grey
-    style Runner fill:#0d1117,stroke:#30363d,stroke-width:1px;
-    style Scraper fill:#0d1117,stroke:#30363d,stroke-width:1px;
-    style Sources fill:#0d1117,stroke:#21262d,stroke-width:1px;
-    style Category fill:#0d1117,stroke:#21262d,stroke-width:1px;
-    style Outputs fill:#0d1117,stroke:#30363d,stroke-width:1px;
-    style External fill:#0d1117,stroke:#da3633,stroke-width:1px;
+    %% --- SUBGRAPH STYLING ---
+    style Runner fill:#0d1117,stroke:#30363d,stroke-width:2px;
+    style Scraper fill:#0d1117,stroke:#30363d,stroke-width:2px;
+    style Sources fill:#0d1117,stroke:#3fb950,stroke-width:2px;
+    style Category fill:#0d1117,stroke:#58a6ff,stroke-width:2px;
+    style Outputs fill:#0d1117,stroke:#8b949e,stroke-width:2px;
+    style External fill:#0d1117,stroke:#da3633,stroke-width:2px;
 ```
 
 | Stage | Component | Interval / behavior |
@@ -123,7 +125,7 @@ flowchart TB
 
 ## 🕸️ Knowledge Graph
 
-DeVault is optimized for Obsidian, allowing you to visualize the connections between different intelligence reports and news items. Below is a representation of the vault's knowledge graph, showing the high density of information collected over time.
+DeVault is optimized for Obsidian, allowing you to visualize the connections between different intelligence reports and news items. Below is a representation of the vault's knowledge graph, showing the relationships between actors, themes, and temporal patterns.
 
 
 ## 📁 Project Structure
@@ -176,7 +178,7 @@ This will activate the 30-minute scraping cycle and the 5-minute cleanup logic.
 ### ⚙️ Reliability & Robustness
 - **Broad Exception Handling**: The codebase uses many `try...except: pass` blocks. While this prevents the script from crashing, it hides potential issues (e.g., network failures, API changes).
 - **AI Output Validation**: Several reports in the vault contain "No summary.", indicating silent failures in the Ollama pipeline. Better logging and retry logic for AI calls would improve reliability.
-- **Context Limit**: The `extract_article_text` function currently only captures the first 300 characters of an article. This often includes navigation menus rather than core content. Increasing this limit or using a more sophisticated text extractor would improve AI analysis quality.
+- **Context Limit**: The `extract_article_text` function currently only captures the first 300 characters of an article. This often includes navigation menus rather than core content. Increasing this limit would improve context quality.
 
 ### 🏗️ Architecture & Performance
 - **Concurrency**: Excellent use of `ThreadPoolExecutor` for parallel scraping and context extraction.
@@ -184,4 +186,4 @@ This will activate the 30-minute scraping cycle and the 5-minute cleanup logic.
 - **Portability**: `runner.py` contains a hardcoded absolute path to `scraper.py`. This should be changed to a relative path to allow the project to run from any directory.
 
 ### 🧹 Maintenance
-- **Vault Cleanup**: The `organize_vault` function in `runner.py` moves files to an `Archived` folder. However, `scraper.py` already organizes files into date-specific subfolders. This redundancy should be reviewed to ensure a clean directory structure.
+- **Vault Cleanup**: The `organize_vault` function in `runner.py` moves files to an `Archived` folder. However, `scraper.py` already organizes files into date-specific subfolders. This redundancy should be clarified or consolidated.
