@@ -15,7 +15,6 @@ DeVault is an automated news scraping and AI-driven intelligence analysis pipeli
 
 DeVault is optimized for Obsidian, allowing you to visualize the connections between different intelligence reports and news items. Below is a representation of the vault's knowledge graph, showing the high density of information collected over time.
 
-![DeVault Knowledge Graph](/home/seanb/.cursor/projects/home-seanb-Documents-DeVault/assets/image-ae440ae3-e1fc-429f-a346-ddecaff1a1b8.png)
 
 ## 📁 Project Structure
 
