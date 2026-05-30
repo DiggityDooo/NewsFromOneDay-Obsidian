@@ -16,25 +16,6 @@ DeVault is an automated news scraping and AI-driven intelligence analysis pipeli
 End-to-end flow from orchestration through scraping, AI analysis, vault storage, and external publishing.
 
 ```mermaid
-Here is the complete, integrated Mermaid block.
-
-I have combined your structural logic—including the third Outputs subgraph and the cross-subgraph external links—with the layout optimizations and the techno-brutalist dark theme initialization.
-
-Copy and paste this version directly into your visualizer:
-
-Code snippet
-%%{init: {
-  'theme': 'base',
-  'themeVariables': {
-    'background': '#0d1117',
-    'primaryColor': '#1f242c',
-    'primaryTextColor': '#c9d1d9',
-    'lineColor': '#58a6ff',
-    'secondaryColor': '#161b22',
-    'tertiaryColor': '#0d1117'
-  }
-}}%%
-
 flowchart TB
     %% --- RUNNER (24H ORCHESTRATOR) ---
     subgraph Runner["runner.py — 24h orchestrator"]
@@ -110,7 +91,7 @@ flowchart TB
     SUM --> OBS
     ORG --> ARCH
 
-    %% --- STYLING / CLASSES ---
+    %% --- CLASS STYLING (FALLBACK SAFE) ---
     classDef default fill:#1f242c,stroke:#30363d,stroke-width:1px,color:#c9d1d9;
     classDef source fill:#161b22,stroke:#58a6ff,stroke-width:1px,color:#c9d1d9;
     classDef loop fill:#21262d,stroke:#f0883e,stroke-width:1px,color:#c9d1d9;
