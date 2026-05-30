@@ -11,6 +11,85 @@ DeVault is an automated news scraping and AI-driven intelligence analysis pipeli
 - **AnythingLLM Integration**: Pushes generated reports to AnythingLLM for document management and vector embedding updates.
 - **Automated Maintenance**: Includes a runner script that schedules scrapes every 30 minutes and performs vault cleanup every 5 minutes.
 
+## 🔄 Pipeline Workflow
+
+End-to-end flow from orchestration through scraping, AI analysis, vault storage, and external publishing.
+
+```mermaid
+flowchart TB
+    subgraph Runner["runner.py — 24h orchestrator"]
+        START([Start Hub]) --> RUN_SCRAPER[Run scraper.py]
+        RUN_SCRAPER --> WAIT{Remaining time<br/>in 30-min interval?}
+        WAIT -->|Yes| CLEANUP{5 min since<br/>last cleanup?}
+        CLEANUP -->|Yes| ORG[organize_vault]
+        ORG --> MOVE[Move loose .md → Archived/YYYY-MM-DD]
+        MOVE --> SLEEP[Sleep 10s]
+        CLEANUP -->|No| SLEEP
+        SLEEP --> WAIT
+        WAIT -->|No| NEXT_RUN[Next run counter++]
+        NEXT_RUN --> RUN_SCRAPER
+        START -.->|KeyboardInterrupt| STOP([Hub deactivated])
+    end
+
+    subgraph Scraper["scraper.py — single cycle"]
+        direction TB
+        PARALLEL{{ThreadPoolExecutor<br/>6 categories in parallel}}
+
+        subgraph Sources["Data sources"]
+            S1[tech — Hacker News]
+            S2[conflicts — BBC RSS]
+            S3[geopolitics — Al Jazeera RSS]
+            S4[worldnews — Reddit r/worldnews]
+            S5[rumors — Reddit r/conspiracy]
+            S6[intel — Reddit r/OSINT]
+        end
+
+        PARALLEL --> P1
+
+        subgraph Category["process_category — per category"]
+            P1[Phase 1: Scrape top 10 headlines] --> SAVE_H[Save Headlines/*.md<br/>YAML frontmatter]
+            SAVE_H --> P2[Phase 2: Extract article text<br/>top 2 articles, parallel]
+            P2 --> P3[Phase 3: Ollama AI analysis<br/>ollama_lock serializes LLM calls]
+            P3 --> PREV[Load previous summary tail<br/>for trend context]
+            PREV --> PROMPT[Build intel prompt:<br/>actors · conspiracies · convergence · forecasts · solutions]
+            PROMPT --> OLLAMA[(Ollama gemma4:e4b)]
+            OLLAMA --> P4[Phase 4: Publish Summaries/*.md]
+            P4 --> PUSH[push_to_anythingllm]
+        end
+
+        Sources --> PARALLEL
+    end
+
+    subgraph Outputs["Vault & integrations"]
+        HEAD[(Headlines/category/date/*.md)]
+        SUM[(Summaries/category/date/*-intel.md)]
+        ARCH[(Archived/ — cleanup target)]
+        ALLM[(AnythingLLM workspace<br/>devbrain + embeddings)]
+        OBS[(Obsidian knowledge graph)]
+    end
+
+    RUN_SCRAPER --> Scraper
+    SAVE_H --> HEAD
+    P4 --> SUM
+    PUSH --> ALLM
+    HEAD --> OBS
+    SUM --> OBS
+    ORG --> ARCH
+
+    subgraph External["External services"]
+        OLLAMA
+        ALLM
+    end
+```
+
+| Stage | Component | Interval / behavior |
+|-------|-----------|---------------------|
+| Orchestration | `runner.py` | 30-min scrape cycles for 24h; 5-min vault cleanup during idle |
+| Scrape | `scraper.py` Phase 1 | 6 categories in parallel; 10 headlines each |
+| Context | Phase 2 | Top 2 articles per category; full-page text (300 char cap) |
+| Analysis | Phase 3 | Ollama via serialized lock; prior summary injected as trend |
+| Publish | Phase 4 | Markdown reports → vault + AnythingLLM upload + embedding refresh |
+
 ## 🕸️ Knowledge Graph
 
 DeVault is optimized for Obsidian, allowing you to visualize the connections between different intelligence reports and news items. Below is a representation of the vault's knowledge graph, showing the high density of information collected over time.
