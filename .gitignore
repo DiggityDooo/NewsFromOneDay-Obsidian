@@ -1,0 +1,25 @@
+# Data
+Headlines/
+Summaries/
+News/
+Agent/
+*.json
+*.jsonl
+*.md
+!README.md
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+
+# System
+.DS_Store
+.cursor/
+.obsidian/
+terminals/
+assets/
+Untitled.canvas
