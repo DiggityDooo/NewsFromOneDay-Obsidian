@@ -16,26 +16,52 @@ DeVault is an automated news scraping and AI-driven intelligence analysis pipeli
 End-to-end flow from orchestration through scraping, AI analysis, vault storage, and external publishing.
 
 ```mermaid
+Here is the complete, integrated Mermaid block.
+
+I have combined your structural logic—including the third Outputs subgraph and the cross-subgraph external links—with the layout optimizations and the techno-brutalist dark theme initialization.
+
+Copy and paste this version directly into your visualizer:
+
+Code snippet
+%%{init: {
+  'theme': 'base',
+  'themeVariables': {
+    'background': '#0d1117',
+    'primaryColor': '#1f242c',
+    'primaryTextColor': '#c9d1d9',
+    'lineColor': '#58a6ff',
+    'secondaryColor': '#161b22',
+    'tertiaryColor': '#0d1117'
+  }
+}}%%
+
 flowchart TB
+    %% --- RUNNER (24H ORCHESTRATOR) ---
     subgraph Runner["runner.py — 24h orchestrator"]
+        direction TB
         START([Start Hub]) --> RUN_SCRAPER[Run scraper.py]
         RUN_SCRAPER --> WAIT{Remaining time<br/>in 30-min interval?}
+        
         WAIT -->|Yes| CLEANUP{5 min since<br/>last cleanup?}
         CLEANUP -->|Yes| ORG[organize_vault]
         ORG --> MOVE[Move loose .md → Archived/YYYY-MM-DD]
         MOVE --> SLEEP[Sleep 10s]
+        
         CLEANUP -->|No| SLEEP
         SLEEP --> WAIT
+        
         WAIT -->|No| NEXT_RUN[Next run counter++]
         NEXT_RUN --> RUN_SCRAPER
         START -.->|KeyboardInterrupt| STOP([Hub deactivated])
     end
 
+    %% --- SCRAPER (SINGLE CYCLE) ---
     subgraph Scraper["scraper.py — single cycle"]
         direction TB
         PARALLEL{{ThreadPoolExecutor<br/>6 categories in parallel}}
 
         subgraph Sources["Data sources"]
+            direction LR
             S1[tech — Hacker News]
             S2[conflicts — BBC RSS]
             S3[geopolitics — Al Jazeera RSS]
@@ -44,9 +70,11 @@ flowchart TB
             S6[intel — Reddit r/OSINT]
         end
 
+        Sources --> PARALLEL
         PARALLEL --> P1
 
         subgraph Category["process_category — per category"]
+            direction TB
             P1[Phase 1: Scrape top 10 headlines] --> SAVE_H[Save Headlines/*.md<br/>YAML frontmatter]
             SAVE_H --> P2[Phase 2: Extract article text<br/>top 2 articles, parallel]
             P2 --> P3[Phase 3: Ollama AI analysis<br/>ollama_lock serializes LLM calls]
@@ -56,10 +84,9 @@ flowchart TB
             OLLAMA --> P4[Phase 4: Publish Summaries/*.md]
             P4 --> PUSH[push_to_anythingllm]
         end
-
-        Sources --> PARALLEL
     end
 
+    %% --- OUTPUTS & INTEGRATIONS ---
     subgraph Outputs["Vault & integrations"]
         HEAD[(Headlines/category/date/*.md)]
         SUM[(Summaries/category/date/*-intel.md)]
@@ -68,7 +95,14 @@ flowchart TB
         OBS[(Obsidian knowledge graph)]
     end
 
-    RUN_SCRAPER --> Scraper
+    %% --- EXTERNAL SERVICES ---
+    subgraph External["External services"]
+        OLLAMA
+        ALLM
+    end
+
+    %% --- SYSTEM INTERCONNECTIONS ---
+    RUN_SCRAPER ==> Scraper
     SAVE_H --> HEAD
     P4 --> SUM
     PUSH --> ALLM
@@ -76,10 +110,17 @@ flowchart TB
     SUM --> OBS
     ORG --> ARCH
 
-    subgraph External["External services"]
-        OLLAMA
-        ALLM
-    end
+    %% --- STYLING / CLASSES ---
+    classDef default fill:#1f242c,stroke:#30363d,stroke-width:1px,color:#c9d1d9;
+    classDef source fill:#161b22,stroke:#58a6ff,stroke-width:1px,color:#c9d1d9;
+    classDef loop fill:#21262d,stroke:#f0883e,stroke-width:1px,color:#c9d1d9;
+    classDef terminal fill:#0d1117,stroke:#da3633,stroke-width:1px,color:#f85149;
+    classDef vault fill:#1f242c,stroke:#8b949e,stroke-dasharray: 5 5,color:#c9d1d9;
+
+    class S1,S2,S3,S4,S5,S6 source;
+    class WAIT,CLEANUP loop;
+    class START,STOP terminal;
+    class HEAD,SUM,ARCH,OBS vault;
 ```
 
 | Stage | Component | Interval / behavior |
