@@ -102,6 +102,15 @@ flowchart TB
     class WAIT,CLEANUP loop;
     class START,STOP terminal;
     class HEAD,SUM,ARCH,OBS vault;
+
+
+    %% Direct background styling for the containers to kill the grey
+    style Runner fill:#0d1117,stroke:#30363d,stroke-width:1px;
+    style Scraper fill:#0d1117,stroke:#30363d,stroke-width:1px;
+    style Sources fill:#0d1117,stroke:#21262d,stroke-width:1px;
+    style Category fill:#0d1117,stroke:#21262d,stroke-width:1px;
+    style Outputs fill:#0d1117,stroke:#30363d,stroke-width:1px;
+    style External fill:#0d1117,stroke:#da3633,stroke-width:1px;
 ```
 
 | Stage | Component | Interval / behavior |
